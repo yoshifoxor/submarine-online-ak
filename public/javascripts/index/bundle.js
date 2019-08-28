@@ -5936,6 +5936,12 @@ var gameObj = {
   itemRadius: 4,
   airRadius: 5,
   deg: 0,
+  rotationDegreeByDirection: {
+    'left': 0,
+    'up': 270,
+    'down': 90,
+    'right': 0
+  },
   myDisplayName: (0, _jquery2.default)('#main').attr('data-displayName'),
   myThumbUrl: (0, _jquery2.default)('#main').attr('data-thumbUrl'),
   fieldWidth: null,
@@ -5974,7 +5980,7 @@ function ticker() {
   gameObj.ctxRader.clearRect(0, 0, gameObj.raderCanvasWidth, gameObj.raderCanvasHeight); // まっさら
   drawRadar(gameObj.ctxRader);
   drawMap(gameObj);
-  drawSubmarine(gameObj.ctxRader);
+  drawSubmarine(gameObj.ctxRader, gameObj.myPlayerObj);
 }
 setInterval(ticker, 33);
 
@@ -6000,10 +6006,16 @@ function drawRadar(ctxRader) {
   gameObj.deg = (gameObj.deg + 5) % 360;
 }
 
-function drawSubmarine(ctxRader) {
+function drawSubmarine(ctxRader, myPlayerObj) {
+
+  var rotationDegree = gameObj.rotationDegreeByDirection[myPlayerObj.direction];
+
   ctxRader.save();
   ctxRader.translate(gameObj.raderCanvasWidth / 2, gameObj.raderCanvasHeight / 2);
-
+  ctxRader.rotate(getRadian(rotationDegree));
+  if (myPlayerObj.direction === 'left') {
+    ctxRader.scale(-1, 1);
+  }
   ctxRader.drawImage(gameObj.submarineImage, -(gameObj.submarineImage.width / 2), -(gameObj.submarineImage.height / 2));
   ctxRader.restore();
 }
@@ -6253,6 +6265,41 @@ function calcOpacity(degreeDiff) {
   var deleteDeg = 270;
   degreeDiff = degreeDiff > deleteDeg ? deleteDeg : degreeDiff; // もう少しだけ暗くするコツ
   return (1 - degreeDiff / deleteDeg).toFixed(2);
+}
+
+(0, _jquery2.default)(window).keydown(function (event) {
+  if (!gameObj.myPlayerObj || gameObj.myPlayerObj.isAlive === false) return;
+
+  switch (event.key) {
+    case 'ArrowLeft':
+      if (gameObj.myPlayerObj.direction === 'left') break; // 変わってない
+      gameObj.myPlayerObj.direction = 'left';
+      drawSubmarine(gameObj.ctxRader, gameObj.myPlayerObj);
+      sendChangeDirection(socket, 'left');
+      break;
+    case 'ArrowUp':
+      if (gameObj.myPlayerObj.direction === 'up') break; // 変わってない
+      gameObj.myPlayerObj.direction = 'up';
+      drawSubmarine(gameObj.ctxRader, gameObj.myPlayerObj);
+      sendChangeDirection(socket, 'up');
+      break;
+    case 'ArrowDown':
+      if (gameObj.myPlayerObj.direction === 'down') break; // 変わってない
+      gameObj.myPlayerObj.direction = 'down';
+      drawSubmarine(gameObj.ctxRader, gameObj.myPlayerObj);
+      sendChangeDirection(socket, 'down');
+      break;
+    case 'ArrowRight':
+      if (gameObj.myPlayerObj.direction === 'right') break; // 変わってない
+      gameObj.myPlayerObj.direction = 'right';
+      drawSubmarine(gameObj.ctxRader, gameObj.myPlayerObj);
+      sendChangeDirection(socket, 'right');
+      break;
+  }
+});
+
+function sendChangeDirection(socket, direction) {
+  socket.emit('change direction', direction);
 }
 
 /***/ }),
