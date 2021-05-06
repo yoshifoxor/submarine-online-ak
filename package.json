@@ -1,30 +1,31 @@
 {
-  "name": "submarine-online",
+  "name": "submarine-online-ak",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "build": "npx webpack"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~4.1.1",
-    "express": "~4.16.1",
-    "express-session": "1.15.6",
-    "helmet": "1.1.0",
-    "http-errors": "~1.6.3",
-    "jquery": "3.4.1",
-    "morgan": "~1.9.1",
-    "passport": "0.4.0",
-    "passport-twitter": "1.0.4",
-    "pug": "2.0.4",
-    "socket.io": "2.2.0",
-    "socket.io-client": "2.2.0"
+    "cookie-parser": "~1.4.5",
+    "debug": "~4.3.1",
+    "express": "~4.17.1",
+    "express-session": "^1.17.1",
+    "helmet": "^4.6.0",
+    "http-errors": "~1.8.0",
+    "jquery": "^3.6.0",
+    "morgan": "~1.10.0",
+    "passport": "^0.4.1",
+    "passport-twitter": "^1.0.4",
+    "pug": "3.0.2",
+    "socket.io": "^4.0.1",
+    "socket.io-client": "^4.0.1"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "7",
-    "babel-preset-env": "^1.7.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.1",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.6.0"
   }
 }

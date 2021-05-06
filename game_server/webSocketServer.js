@@ -7,11 +7,11 @@ function createWebSocketServer(io, game) {
     const startObj = game.newConnection(socket.id, displayName, thumbUrl);
     socket.emit('start data', startObj);
 
-    socket.on('change direction', (direction) => {
+    socket.on('change direction', direction => {
       game.updatePlayerDirection(socket.id, direction);
     });
 
-    socket.on('missile emit', (direction) => {
+    socket.on('missile emit', direction => {
       game.missileEmit(socket.id, direction);
     });
 
@@ -26,5 +26,5 @@ function createWebSocketServer(io, game) {
 }
 
 module.exports = {
-  createWebSocketServer
+  createWebSocketServer,
 };

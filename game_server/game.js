@@ -22,7 +22,7 @@ const gameObj = {
   addAirTime: 30,
   itemPoint: 3,
   killPoint: 500,
-  submarineImageWidth: 42
+  submarineImageWidth: 42,
 };
 
 function init() {
@@ -37,10 +37,17 @@ init(); // 初期化（初期化はサーバー起動時に行う）
 
 const gameTicker = setInterval(() => {
   NPCMoveDecision(gameObj.NPCMap); // NPC の行動選択
-  const playersAndNPCMap = new Map(Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap)));
+  const playersAndNPCMap = new Map(
+    Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap))
+  );
   movePlayers(playersAndNPCMap); // 潜水艦の移動
   moveMissile(gameObj.flyingMissilesMap); // ミサイルの移動
-  checkGetItem(playersAndNPCMap, gameObj.itemsMap, gameObj.airMap, gameObj.flyingMissilesMap);
+  checkGetItem(
+    playersAndNPCMap,
+    gameObj.itemsMap,
+    gameObj.airMap,
+    gameObj.flyingMissilesMap
+  );
   addNPC();
 }, 33);
 
@@ -61,7 +68,8 @@ function NPCMoveDecision(NPCMap) {
   }
 }
 
-function movePlayers(playersMap) { // 潜水艦の移動
+function movePlayers(playersMap) {
+  // 潜水艦の移動
   for (let [playerId, player] of playersMap) {
     if (player.isAlive === false) {
       if (player.deadCount < 70) {
@@ -69,7 +77,6 @@ function movePlayers(playersMap) { // 潜水艦の移動
       } else {
         gameObj.playersMap.delete(playerId);
         gameObj.NPCMap.delete(playerId);
-
       }
       continue;
     }
@@ -103,7 +110,8 @@ function movePlayers(playersMap) { // 潜水艦の移動
   }
 }
 
-function moveMissile(flyingMissilesMap) { // ミサイルの移動
+function moveMissile(flyingMissilesMap) {
+  // ミサイルの移動
   for (let [missileId, flyingMissile] of flyingMissilesMap) {
     const missile = flyingMissile;
 
@@ -128,10 +136,14 @@ function moveMissile(flyingMissilesMap) { // ミサイルの移動
         flyingMissile.x += gameObj.missileSpeed;
         break;
     }
-    if (flyingMissile.x > gameObj.fieldWidth) flyingMissile.x -= gameObj.fieldWidth;
-    if (flyingMissile.x < 0) flyingMissile.x += gameObj.fieldWidth;
-    if (flyingMissile.y < 0) flyingMissile.y += gameObj.fieldHeight;
-    if (flyingMissile.y > gameObj.fieldHeight) flyingMissile.y -= gameObj.fieldHeight;
+    if (flyingMissile.x > gameObj.fieldWidth)
+      flyingMissile.x -= gameObj.fieldWidth;
+    if (flyingMissile.x < 0)
+      flyingMissile.x += gameObj.fieldWidth;
+    if (flyingMissile.y < 0)
+      flyingMissile.y += gameObj.fieldHeight;
+    if (flyingMissile.y > gameObj.fieldHeight)
+      flyingMissile.y -= gameObj.fieldHeight;
   }
 }
 
@@ -158,11 +170,10 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
       );
 
       if (
-        distanceObj.distanceX <=
-          gameObj.submarineImageWidth / 2 + gameObj.itemRadius &&
-        distanceObj.distanceY <=
-          gameObj.submarineImageWidth / 2 + gameObj.itemRadius
-      ) { // got item!
+        distanceObj.distanceX <= gameObj.submarineImageWidth / 2 + gameObj.itemRadius &&
+        distanceObj.distanceY <= gameObj.submarineImageWidth / 2 + gameObj.itemRadius
+      ) {
+        // got item!
         gameObj.itemsMap.delete(itemKey);
         playerObj.missilesMany = playerObj.missilesMany > 5 ? 6 : playerObj.missilesMany + 1;
         playerObj.score += gameObj.itemPoint;
@@ -182,11 +193,10 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
       );
 
       if (
-        distanceObj.distanceX <=
-          gameObj.submarineImageWidth / 2 + gameObj.airRadius &&
-        distanceObj.distanceY <=
-          gameObj.submarineImageWidth / 2 + gameObj.airRadius
-      ) { // got air!
+        distanceObj.distanceX <= gameObj.submarineImageWidth / 2 + gameObj.airRadius &&
+        distanceObj.distanceY <= gameObj.submarineImageWidth / 2 + gameObj.airRadius
+      ) {
+        // got air!
         gameObj.airMap.delete(airKey);
         if (playerObj.airTime + gameObj.addAirTime > 99) {
           playerObj.airTime = 99;
@@ -201,12 +211,17 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
     // 撃ち放たれているミサイル
     for (let [missileId, flyingMissile] of flyingMissilesMap) {
       const distanceObj = calculationBetweenTwoPoints(
-        playerObj.x, playerObj.y, flyingMissile.x, flyingMissile.y, gameObj.fieldWidth, gameObj.fieldHeight
+        playerObj.x,
+        playerObj.y,
+        flyingMissile.x,
+        flyingMissile.y,
+        gameObj.fieldWidth,
+        gameObj.fieldHeight
       );
 
       if (
-        distanceObj.distanceX <= (gameObj.submarineImageWidth / 2 + gameObj.missileWidth / 2) &&
-        distanceObj.distanceY <= (gameObj.submarineImageWidth / 2 + gameObj.missileHeight / 2) &&
+        distanceObj.distanceX <= gameObj.submarineImageWidth / 2 + gameObj.missileWidth / 2 &&
+        distanceObj.distanceY <= gameObj.submarineImageWidth / 2 + gameObj.missileHeight / 2 &&
         playerObj.playerId !== flyingMissile.emitPlayerId
       ) {
         playerObj.isAlive = false;
@@ -239,9 +254,9 @@ function newConnection(socketId, displayName, thumbUrl) {
     direction: 'right',
     missilesMany: 0,
     airTime: 99,
-    aliveTime: { 'clock': 0, 'seconds': 0 },
+    aliveTime: { clock: 0, seconds: 0 },
     deadCount: 0,
-    score: 0
+    score: 0,
   };
   gameObj.playersMap.set(socketId, playerObj);
 
@@ -249,7 +264,7 @@ function newConnection(socketId, displayName, thumbUrl) {
     playerObj: playerObj,
     fieldWidth: gameObj.fieldWidth,
     fieldHeight: gameObj.fieldHeight,
-    missileSpeed: gameObj.missileSpeed
+    missileSpeed: gameObj.missileSpeed,
   };
   return startObj;
 }
@@ -259,7 +274,9 @@ function getMapData() {
   const itemsArray = [];
   const airArray = [];
   const flyingMissilesArray = [];
-  const playersAndNPCMap = new Map(Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap)));
+  const playersAndNPCMap = new Map(
+    Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap))
+  );
 
   for (let [socketId, plyer] of playersAndNPCMap) {
     const playerDataForSend = [];
@@ -316,7 +333,9 @@ function updatePlayerDirection(socketId, direction) {
 }
 
 function missileEmit(socketId, direction) {
-  const playersAndNPCMap = new Map(Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap)));
+  const playersAndNPCMap = new Map(
+    Array.from(gameObj.playersMap).concat(Array.from(gameObj.NPCMap))
+  );
 
   if (!playersAndNPCMap.has(socketId)) return;
 
@@ -326,7 +345,7 @@ function missileEmit(socketId, direction) {
   if (emitPlayerObj.isAlive === false) return; // 死んでるやんけ
 
   emitPlayerObj.missilesMany -= 1;
-  const missileId = Math.floor(Math.random() * 100000) + ',' + socketId + ',' + emitPlayerObj.x + ',' + emitPlayerObj.y;
+  const missileId = `${Math.floor(Math.random() * 100000)},${socketId},${emitPlayerObj.x},${emitPlayerObj.y}`;
 
   const missileObj = {
     emitPlayerId: emitPlayerObj.playerId,
@@ -335,7 +354,7 @@ function missileEmit(socketId, direction) {
     y: emitPlayerObj.y,
     aliveFlame: gameObj.missileAliveFlame,
     direction: direction,
-    id: missileId
+    id: missileId,
   };
   gameObj.flyingMissilesMap.set(missileId, missileObj);
 }
@@ -349,7 +368,8 @@ function addItem() {
   const itemY = Math.floor(Math.random() * gameObj.fieldHeight);
   const itemKey = `${itemX},${itemY}`;
 
-  if (gameObj.itemsMap.has(itemKey)) { // アイテムの位置が被ってしまった場合は
+  if (gameObj.itemsMap.has(itemKey)) {
+    // アイテムの位置が被ってしまった場合は
     return addItem(); // 場所が重複した場合は作り直し
   }
 
@@ -365,7 +385,8 @@ function addAir() {
   const airY = Math.floor(Math.random() * gameObj.fieldHeight);
   const airKey = `${airX},${airY}`;
 
-  if (gameObj.airMap.has(airKey)) { // アイテムの位置が被ってしまった場合は
+  if (gameObj.airMap.has(airKey)) {
+    // アイテムの位置が被ってしまった場合は
     return addAir(); // 場所が重複した場合は作り直し
   }
 
@@ -377,14 +398,18 @@ function addAir() {
 }
 
 function addNPC() {
-  if (gameObj.playersMap.size + gameObj.NPCMap.size < gameObj.addingNPCPlayerNum) {
+  if (
+    gameObj.playersMap.size + gameObj.NPCMap.size <
+    gameObj.addingNPCPlayerNum
+  ) {
     const addMany = gameObj.addingNPCPlayerNum - gameObj.playersMap.size - gameObj.NPCMap.size;
 
     for (let i = 0; i < addMany; i++) {
       const playerX = Math.floor(Math.random() * gameObj.fieldWidth);
       const playerY = Math.floor(Math.random() * gameObj.fieldHeight);
       const level = Math.floor(Math.random() * 1) + 1;
-      const id = Math.floor(Math.random() * 100000) + ',' + playerX + ',' + playerY + ',' + level;
+      const id = `${Math.floor(Math.random() * 100000)},${playerX},${playerY},${level}`;
+
       const playerObj = {
         x: playerX,
         y: playerY,
@@ -393,12 +418,12 @@ function addNPC() {
         direction: 'right',
         missilesMany: 0,
         airTime: 99,
-        aliveTime: { 'clock': 0, 'seconds': 0 },
+        aliveTime: { clock: 0, seconds: 0 },
         score: 0,
         level: level,
         displayName: 'NPC',
         thumbUrl: 'NPC',
-        playerId: id
+        playerId: id,
       };
       gameObj.NPCMap.set(id, playerObj);
     }
@@ -445,10 +470,7 @@ function calculationBetweenTwoPoints(pX, pY, oX, oY, gameWidth, gameHeight) {
     }
   }
 
-  return {
-    distanceX,
-    distanceY
-  };
+  return { distanceX, distanceY };
 }
 
 module.exports = {
@@ -456,5 +478,5 @@ module.exports = {
   getMapData,
   updatePlayerDirection,
   missileEmit,
-  disconnect
+  disconnect,
 };

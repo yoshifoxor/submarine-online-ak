@@ -12,23 +12,25 @@ var config = require('./config');
 var indexRouter = require('./routes/index');
 var gameRouter = require('./routes/game');
 
-passport.use(new Strategy({
-    consumerKey: config.twitter.consumerKey,
-    consumerSecret: config.twitter.consumerSecret,
-    callbackURL: config.twitter.callbackURL
-  },
-  function(token, tokenSecret, profile, cb) {
-    process.nextTick(function () {
-      return cb(null, profile);
-    });
-  })
+passport.use(new Strategy(
+    {
+      consumerKey: config.twitter.consumerKey,
+      consumerSecret: config.twitter.consumerSecret,
+      callbackURL: config.twitter.callbackURL,
+    },
+    function (token, tokenSecret, profile, cb) {
+      process.nextTick(function () {
+        return cb(null, profile);
+      });
+    }
+  )
 );
 
-passport.serializeUser(function(user, cb) {
+passport.serializeUser(function (user, cb) {
   cb(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
+passport.deserializeUser(function (obj, cb) {
   cb(null, obj);
 });
 
@@ -45,42 +47,48 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-app.use(session({ secret: '638930281ede942a', resave: false, saveUninitialized: false }));
+app.use(
+  session({
+    secret: '638930281ede942a',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/game', gameRouter);
 
-app.get('/login/twitter',
-  passport.authenticate('twitter')
-);
+app.get('/login/twitter', passport.authenticate('twitter'));
 
-app.get('/oauth_callback',
+app.get(
+  '/oauth_callback',
   passport.authenticate('twitter', { failureRedirect: '/' }),
-  function(req, res) {
+  function (req, res) {
     res.redirect('/');
   }
 );
 
 app.get('/logout', function (req, res) {
   req.logout();
-    res.redirect('/');
+  res.redirect('/');
 });
 
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
+  if (req.isAuthenticated()) {
+    return next();
+  }
   res.redirect('/');
 }
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
