@@ -1,4 +1,4 @@
-FROM --platform=linux/x86_64 node:14.18.3-slim
+FROM --platform=linux/x86_64 node:18.3.0-slim
 
 RUN sed -i 's@archive.ubuntu.com@ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list
 
@@ -10,7 +10,7 @@ RUN apt-get update \
 RUN locale-gen ja_JP.UTF-8
 RUN localedef -f UTF-8 -i ja_JP ja_JP
 
-ENV LANG ja_JP.UTF-8
-ENV TZ Asia/Tokyo
+ENV LANG=ja_JP.UTF-8
+ENV TZ=Asia/Tokyo
 
 WORKDIR /submarine-online-ak
