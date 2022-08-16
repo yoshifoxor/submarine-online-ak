@@ -8,7 +8,7 @@ router.get('/', (req, res, next) => {
   let thumbUrl = 'anonymous';
   if (req.user) {
     displayName = req.user.displayName;
-    thumbUrl = req.user.photo[0].value;
+    thumbUrl = req.user.photos[0].value;
   }
   res.render('game', { title: '潜水艦ゲーム', displayName: displayName, thumbUrl: thumbUrl, ipAddress: process.env.IPADDRESS });
 });
