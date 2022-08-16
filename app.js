@@ -8,10 +8,9 @@ const session = require('express-session');
 const passport = require('passport');
 const Strategy = require('passport-twitter').Strategy;
 require('dotenv').config();
-const config = require('')
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const gameRouter = require('./routes/game');
 
 passport.use(new Strategy({
     consumerKey: process.env.TWITTER_CONSUMERKEY,
@@ -26,7 +25,17 @@ passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((obj, cb) => cb(null, obj));
 
 const app = express();
-app.use(helmet());
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", 'abs.twimg.com', 'pbs.twimg.com'],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -43,7 +52,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/game', gameRouter);
 
 app.get('/login/twitter',
   passport.authenticate('twitter')
@@ -69,12 +78,12 @@ function ensureAuthenticated(req, res, next) {
 }
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

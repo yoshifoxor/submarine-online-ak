@@ -3,7 +3,7 @@ FROM --platform=linux/x86_64 node:18.3.0-slim
 RUN sed -i 's@archive.ubuntu.com@ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list
 
 RUN apt-get update \
-&& apt-get install --no-install-recommends -y locales tmux vim \
+&& apt-get install --no-install-recommends -y git procps locales tmux vim \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
