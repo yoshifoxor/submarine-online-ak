@@ -1,5 +1,6 @@
 'use strict';
 import $ from 'jquery';
+import io from 'socket.io-client';
 
 const gameObj = {
   raderCanvasWidth: 500,
@@ -8,11 +9,16 @@ const gameObj = {
   scoreCanvasHeight: 500,
   deg: 0,
   myDisplayName: $('#main').attr('data-displayName'),
-  myThumbUrl: $('#main').attr('data-thumbUrl')
+  myThumbUrl: $('#main').attr('data-thumbUrl'),
 };
 
-function init() {
+const socketQueryParameters = `displayName=${gameObj.myDisplayName}&thumbUrl=${gameObj.myThumbUrl}`;
+// const socket = io($('#main').attr('data-ipAddress') + '?' + socketQueryParameters);
+const socket = io(
+  `${$('#main').attr('data-ipAddress')}?${socketQueryParameters}`
+);
 
+function init() {
   // ゲーム用のキャンバス
   const raderCanvas = $('#rader')[0];
   raderCanvas.width = gameObj.raderCanvasWidth;
@@ -44,7 +50,7 @@ setInterval(ticker, 33);
 function drawRadar(ctxRader) {
   const x = gameObj.raderCanvasWidth / 2;
   const y = gameObj.raderCanvasHeight / 2;
-  const r = gameObj.raderCanvasWidth * 1.5 / 2; // 対角線の長さの半分
+  const r = (gameObj.raderCanvasWidth * 1.5) / 2; // 対角線の長さの半分
 
   ctxRader.save(); // セーブ
 
@@ -71,6 +77,14 @@ function drawSubmarine(ctxRader) {
   ctxRader.restore();
 }
 
+socket.on('start data', startObj => {
+  console.log('start data came');
+});
+
+socket.on('map data', compressed => {
+  console.log('map data came');
+});
+
 function getRadian(deg) {
-  return deg * Math.PI / 180
+  return (deg * Math.PI) / 180;
 }
