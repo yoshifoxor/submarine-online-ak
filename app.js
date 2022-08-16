@@ -8,7 +8,6 @@ const session = require('express-session');
 const passport = require('passport');
 const Strategy = require('passport-twitter').Strategy;
 require('dotenv').config();
-const config = require('')
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -31,7 +30,7 @@ app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
-        imgSrc: ["'self'", 'abs.twimg.com' /* 'pbs.twimg.com' */],
+        imgSrc: ["'self'", 'abs.twimg.com', 'pbs.twimg.com'],
       },
     },
     crossOriginEmbedderPolicy: false,
