@@ -91,6 +91,11 @@ function getMapData() {
   return [playersArray, itemsArray, airArray];
 }
 
+function updatePlayerDirection(socketId, direction) {
+  const playerObj = gameObj.playersMap.get(socketId);
+  playerObj.direction = direction;
+}
+
 function disconnect(socketId) {
   gameObj.playersMap.delete(socketId);
 }
@@ -160,5 +165,6 @@ function movePlayers(playersMap) { // 潜水艦の移動
 module.exports = {
   newConnection,
   getMapData,
+  updatePlayerDirection,
   disconnect,
 };
