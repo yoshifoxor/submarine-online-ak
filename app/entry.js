@@ -81,6 +81,8 @@ function ticker() {
   drawMissiles(gameObj.ctxScore, gameObj.myPlayerObj.missilesMany);
 
   moveInClient(gameObj.myPlayerObj, gameObj.flyingMissilesMap);
+  drawScore(gameObj.ctxScore, gameObj.myPlayerObj.score);
+  drawRanking(gameObj.ctxScore, gameObj.playersMap);
 
   gameObj.counter = (gameObj.counter + 1) % 10000;
 }
@@ -164,6 +166,60 @@ function drawAirTimer(ctxScore, airTime) {
   ctxScore.fillText(airTime, 110, 50);
 }
 
+function drawScore(ctxScore, score) {
+  ctxScore.fillStyle = "rgb(26, 26, 26)";
+  ctxScore.font = '28px Arial';
+  ctxScore.fillText(`score: ${score}`, 10, 180);
+}
+
+function drawRanking(ctxScore, playersMap) {
+  const playersArray = [].concat(Array.from(playersMap));
+  playersArray.sort((a, b) => b[1].score - a[1].score);
+
+  gameObj.thumbsMap = gameObj.thumbsMap ?? new Map();
+
+  ctxScore.fillStyle = "rgb(0, 0, 0)";
+  ctxScore.fillRect(0, 220, gameObj.scoreCanvasWidth, 3);
+
+  ctxScore.fillStyle = "rgb(26, 26, 26)";
+  ctxScore.font = '20px Arial';
+
+  for (let i = 0; i < 10; i++) {
+    if (!playersArray[i]) return;
+
+    const rank = i + 1;
+    const x = 10, y = 220 + (rank * 26);
+    const { playerId, thumbUrl, displayName, score } = playersArray[i][1];
+
+    if (/twimg\.com/.test(thumbUrl)) {
+      const thumbWidth = 20, thumbHeight = 20;
+      const rankWidth = ctxScore.measureText(`${rank}th `).width;
+
+      let thumb = null;
+
+      if (gameObj.thumbsMap.has(playerId)) {
+        thumb = gameObj.thumbsMap.get(playerId);
+        draw();
+      } else {
+        thumb = new Image();
+        thumb.src = thumbUrl;
+        thumb.onload = draw;
+        gameObj.thumbsMap.set(playerId, thumb);
+      }
+
+      function draw() {
+        ctxScore.fillText(`${rank}th `, x, y);
+        ctxScore.drawImage(thumb, x + rankWidth, y - thumbHeight, thumbWidth, thumbHeight);
+        ctxScore.fillText(` ${displayName} ${score}`, x + rankWidth + thumbWidth, y);
+      };
+
+      continue;
+    }
+
+    ctxScore.fillText(`${rank}th ${displayName} ${score}`, x, y);
+  }
+}
+
 socket.on('start data', startObj => {
   gameObj.fieldWidth = startObj.fieldWidth;
   gameObj.fieldHeight = startObj.fieldHeight;
@@ -191,6 +247,7 @@ socket.on('map data', compressed => {
     player.missilesMany = compressedPlayerData[7];
     player.airTime = compressedPlayerData[8];
     player.deadCount = compressedPlayerData[9];
+    player.thumbUrl = compressedPlayerData[10];
 
     gameObj.playersMap.set(player.playerId, player);
 
@@ -204,7 +261,7 @@ socket.on('map data', compressed => {
       gameObj.myPlayerObj.missilesMany = compressedPlayerData[7];
       gameObj.myPlayerObj.airTime = compressedPlayerData[8];
       gameObj.deadCount = compressedPlayerData[9];
-
+      gameObj.thumbUrl = compressedPlayerData[10];
     }
   }
 

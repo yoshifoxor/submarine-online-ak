@@ -20,6 +20,8 @@ const gameObj = {
   itemRadius: 4,
   airRadius: 6,
   addAirTime: 30,
+  itemPoint: 3,
+  killPoint: 500,
   submarineImageWidth: 42,
 };
 
@@ -111,6 +113,7 @@ function getMapData() {
     playerDataForSend.push(plyer.missilesMany);
     playerDataForSend.push(plyer.airTime);
     playerDataForSend.push(plyer.deadCount)
+    playerDataForSend.push(plyer.thumbUrl);
 
     playersArray.push(playerDataForSend);
   }
@@ -311,6 +314,8 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
 
         gameObj.itemsMap.delete(itemKey);
         playerObj.missilesMany = playerObj.missilesMany > 5 ? 6 : playerObj.missilesMany + 1;
+        playerObj.score += gameObj.itemPoint;
+
         addItem();
       }
     }
@@ -329,6 +334,8 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
         } else {
           playerObj.airTime += gameObj.addAirTime;
         }
+        playerObj.score += gameObj.itemPoint;
+
         addAir();
       }
     }
@@ -340,12 +347,17 @@ function checkGetItem(playersMap, itemsMap, airMap, flyingMissilesMap) {
         playerObj.x, playerObj.y, flyingMissile.x, flyingMissile.y, gameObj.fieldWidth, gameObj.fieldHeight
       );
 
-      if (
-        distanceObj.distanceX <= (gameObj.submarineImageWidth / 2 + gameObj.missileWidth / 2) &&
-        distanceObj.distanceY <= (gameObj.submarineImageWidth / 2 + gameObj.missileHeight / 2) &&
-        playerObj.playerId !== flyingMissile.emitPlayerId
-      ) {
+      if (distanceObj.distanceX <= (gameObj.submarineImageWidth / 2 + gameObj.missileWidth / 2)
+        && distanceObj.distanceY <= (gameObj.submarineImageWidth / 2 + gameObj.missileHeight / 2)
+        && playerObj.playerId !== flyingMissile.emitPlayerId) {
         playerObj.isAlive = false;
+        // 得点の更新
+        if (playersMap.has(flyingMissile.emitPlayerSocketId)) {
+          const emitPlayer = playersMap.get(flyingMissile.emitPlayerSocketId);
+          emitPlayer.score += gameObj.killPoint;
+          playersMap.set(flyingMissile.emitPlayerSocketId, emitPlayer);
+        }
+
         flyingMissilesMap.delete(missileId); // ミサイル（魚雷）の削除
       }
     }
