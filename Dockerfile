@@ -1,9 +1,7 @@
-FROM --platform=linux/x86_64 node:18.3.0-slim
-
-RUN sed -i 's@archive.ubuntu.com@ftp.jaist.ac.jp/pub/Linux@g' /etc/apt/sources.list
+FROM node:20.12-slim
 
 RUN apt-get update \
-&& apt-get install --no-install-recommends -y git procps locales tmux vim \
+&& apt-get install --no-install-recommends -y git locales procps tmux vim \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
@@ -12,5 +10,4 @@ RUN localedef -f UTF-8 -i ja_JP ja_JP
 
 ENV LANG=ja_JP.UTF-8
 ENV TZ=Asia/Tokyo
-
-WORKDIR /submarine-online-ak
+WORKDIR /app
