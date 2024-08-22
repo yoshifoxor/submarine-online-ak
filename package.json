@@ -1,14 +1,16 @@
 {
   "name": "submarine-online-ak",
-  "version": "2.2024.2",
+  "version": "2.2024.4",
   "private": true,
   "repository": "https://github.com/yoshifoxor/submarine-online-ak.git",
   "author": "yoshifoxor <yshs.adachi@gmail.com>",
   "scripts": {
-    "start": "node --watch src/server.js"
+    "start": "node --env-file .env --watch src/server.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.0",
-    "hono": "^4.2.7"
+    "@hono/oauth-providers": "^0.6.1",
+    "hono": "^4.2.7",
+    "iron-session": "^8.0.3"
   }
 }
